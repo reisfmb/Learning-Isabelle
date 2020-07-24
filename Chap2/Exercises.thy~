@@ -1,4 +1,4 @@
-theory Chap2
+theory Exercises
 imports Main
 begin
 

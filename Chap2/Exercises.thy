@@ -94,5 +94,70 @@ done
 text \<open> End of exercise 2.5 \<close>
 
 
+text \<open> Exercise 2.6 \<close>
+datatype 'a tree = Tip | Node "'a tree" 'a "'a tree"
 
+fun contents :: " 'a tree \<Rightarrow> 'a list "
+  where "contents Tip = []" |
+        "contents (Node t1 x t2) = x # (contents t1 @ contents t2)"
+
+fun treesum :: " nat tree \<Rightarrow> nat  "
+  where "treesum Tip = 0" |
+        "treesum (Node t1 x t2) = sum_list (contents (Node t1 x t2))"
+
+lemma treesum_equals_sum_list : "treesum myTree = sum_list (contents myTree)"
+   apply(induction)
+   apply(auto)
+done
+text \<open> End of exercise 2.6 \<close>
+
+text \<open> Exercise 2.7 \<close>
+
+datatype 'a tree2 = Tip 'a | Node "'a tree2" 'a "'a tree2"
+
+fun mirror :: " 'a tree2 \<Rightarrow> 'a tree2"
+  where "mirror (Tip x) = Tip x"|
+        "mirror (Node t1 x t2) = Node (mirror t2) x (mirror t1)"
+
+fun pre_order :: " 'a tree2 \<Rightarrow> 'a list "
+  where "pre_order (Tip x) = x # []" |
+        "pre_order (Node t1 x t2) = x # ( (pre_order t1) @ (pre_order t2) )"
+
+fun post_order :: " 'a tree2 \<Rightarrow> 'a list "
+  where "post_order (Tip x) = x # []" |
+        "post_order (Node t1 x t2) = ( (post_order t1) @ (post_order t2) ) @ (x # [])"
+
+text \<open>
+      1
+     /\
+    2  3
+   /\  /\
+  4 5  6 7
+pre: 1-2-4-5-3-6-7
+post: 4-5-2-6-7-3-1
+\<close>
+
+value "rev(post_order (Node (Node (Tip 4) 2 (Tip 5)) 1 (Node (Tip 6) 3 (Tip (7::int)))))"
+value "pre_order (mirror ((Node (Node (Tip 4) 2 (Tip 5)) 1 (Node (Tip 6) 3 (Tip (7::int))))))"
+
+lemma relation_between_pre_and_post_order : "pre_order (mirror t) = rev (post_order t)"
+  apply(induction t)
+  apply(auto)
+done
+
+text \<open> End of exercise 2.7 \<close>
+
+text \<open> End of exercise 2.8 \<close>
+
+fun interspere :: "'a \<Rightarrow> 'a list \<Rightarrow> 'a list"
+  where "interspere n [] = [n]" |
+        "interspere n [x] = [x]" |
+        "interspere n (x # xs) = [x,n] @ (interspere n xs)"
+
+lemma map_interspere_propertie : "map f (interspere n l) = interspere (f n) (map f l)"
+  apply(induction l rule: interspere.induct)
+  apply(auto)
+done
+
+text \<open> End of exercise 2.8 \<close>
 end
