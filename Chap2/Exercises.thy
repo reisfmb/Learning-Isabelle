@@ -160,4 +160,18 @@ lemma map_interspere_propertie : "map f (interspere n l) = interspere (f n) (map
 done
 
 text \<open> End of exercise 2.8 \<close>
+
+text \<open> Exercise 2.9 \<close>
+
+fun itadd :: "nat \<Rightarrow> nat \<Rightarrow> nat"
+  where "itadd 0 n = n"|
+        "itadd (Suc m) n = itadd m (Suc n)"
+
+lemma itadd_equals_add : "itadd m n = add m n"
+  apply(induction m arbitrary: n)
+  apply(auto)
+done
+
+
+text \<open> End of exercise 2.9 \<close>
 end
