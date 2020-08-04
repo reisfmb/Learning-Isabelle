@@ -174,4 +174,114 @@ done
 
 
 text \<open> End of exercise 2.9 \<close>
+
+text \<open> Exercise 2.10 \<close>
+
+
+datatype tree0 = Tip | Node "tree0" "tree0"
+
+fun nodes :: "tree0 \<Rightarrow> nat"
+  where "nodes Tip = 1" |
+        "nodes (Node t1 t2) = 1 + nodes t1 + nodes t2"
+
+text \<open>
+    N
+   / \
+  T   N
+     / \
+    T   T
+\<close>
+value "nodes (Node (Node Tip Tip) Tip)" 
+
+fun explode :: "nat \<Rightarrow> tree0 \<Rightarrow> tree0" where
+"explode 0 t = t" |
+"explode (Suc n) t = explode n (Node t t )"
+
+value "nodes (explode 0 (Node (Node Tip Tip) Tip))"
+text \<open>
+  So... My Tree0 has 5 elements. 
+  Explode 0 -> 5. Right
+  Explode 1 -> 5 + 5 + 1, since it duplicates the previous and add a node.
+  Explode 2 -> 11 + 11 + 1, same reasoning as before...
+  Therefore let's define n := nodes myTree and f(x) = 2x + 1
+    0 -> n              :5
+    1 -> f(n)           :11 2*5 + 1
+    2 -> f(f(n))        :23 2(2*5+1) + 1
+    3 -> f(f(f(n)))     :47 2*(2*(2*5 + 1) + 1
+\<close>
+
+fun size_explode :: "nat \<Rightarrow> tree0 \<Rightarrow> nat" where
+"size_explode n t = 2^n * (nodes t) + 2^n - 1"
+
+value "nodes (explode 0 (Node (Node Tip Tip) Tip))"
+value "nodes (explode 1 (Node (Node Tip Tip) Tip))"
+value "nodes (explode 2 (Node (Node Tip Tip) Tip))"
+
+value "size_explode 0 (Node (Node Tip Tip) Tip)"
+value "size_explode 1 (Node (Node Tip Tip) Tip)"
+value "size_explode 2 (Node (Node Tip Tip) Tip)"
+
+lemma expression : "nodes (explode n t) = size_explode n t"
+  apply(induction n arbitrary:t)
+  apply(auto simp add: algebra_simps)
+done
+
+
+text \<open> End of exercise 2.10 \<close>
+
+text \<open> Exercise 2.11 \<close>
+
+datatype exp = Var | Const int | Add exp exp | Mult exp exp
+
+fun eval :: "exp \<Rightarrow> int \<Rightarrow> int" where
+"eval Var x = x" |
+"eval (Const a) x = a" |
+"eval (Add a b) x = (eval a x) + (eval b x)" |
+"eval (Mult a b) x = (eval a x) * (eval b x)"
+
+
+value"Add (Var) (Add (Var) (Const 3))"
+text \<open> This seems to be x + x + 3 \<close>
+value"eval (Add (Var) (Add (Var) (Const 3))) 10"
+text \<open> 10 + 10 + 3 = 23, which is exactly the output. Wow. think I got it. \<close>
+
+fun evalp :: "int list \<Rightarrow> int \<Rightarrow> int" where
+"evalp [] x = 0" |
+"evalp (n # xs) x = n + evalp xs x * x"
+
+value "evalp [4::int,2] 0"
+value "evalp [4::int,2] 1"
+value "evalp [4::int,2] 2"
+
+text \<open>
+The above definition is based on the fact that we can put the Var (namely x) in evidence.
+\<close>
+
+fun coeffs :: "exp \<Rightarrow> int list" where
+"coeffs Var = [0,1]"|
+"coeffs (Const n) = [n]"|
+"coeffs (Add a b) = (coeffs a) @ (coeffs b)"|
+"coeffs (Mult a b) = coeffs a"
+
+value "evalp (coeffs (Add (Const (4)) (Mult (Const (2)) Var))) 0"
+value "evalp (coeffs (Add (Const (4)) (Mult (Const (2)) Var))) 1"
+value "evalp (coeffs (Add (Const (4)) (Mult (Const (2)) Var))) 2"
+
+value "eval (Add (Const (4)) (Mult (Const (2)) Var)) 0"
+value "eval (Add (Const (4)) (Mult (Const (2)) Var)) 1"
+value "eval (Add (Const (4)) (Mult (Const (2)) Var)) 2"
+
+text \<open>
+It seems to work fine when the expression is indeed a linear polynomial in it's most compact form.
+But it's not working when it's not... For example x + x is returning [1,1] 
+and the correct output is [2]
+ \<close>
+
+
+theorem voila : "evalp (coeffs e) x = eval e x"
+  apply(induction e arbitrary:x)
+  apply(auto)
+
+
+text \<open> End of exercise 2.11 \<close>
 end
