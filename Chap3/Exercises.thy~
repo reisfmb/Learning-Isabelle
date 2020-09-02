@@ -100,7 +100,7 @@ done
 corollary substitution_consequence: "aval a1 s = aval a2 s \<Longrightarrow> aval (subst x a1 e) s = aval (subst x a2 e) s"
   apply(induction e)
   apply(auto simp add: substitution_lemma)
-  done
+done
 
 text \<open> End of exercise 3.3 \<close>
 
@@ -310,42 +310,54 @@ done
 lemma is_actually_a_nnf: "is_nnf (nnf b)"
   apply(induction b rule:nnf.induct)
   apply(auto)
-done
+  done
+
+lemma neg_aux [simp] : "pbval (nnf (NOT e)) s = (\<not> (pbval (nnf e) s))"
+  apply (induction e)
+  apply auto  
+  done
 
 fun no_or_in_and :: "pbexp \<Rightarrow> bool" where
 "no_or_in_and (OR p q) = False" |
 "no_or_in_and (AND p q) = ((no_or_in_and p) \<and> (no_or_in_and q))" |
 "no_or_in_and a = True"
 
-fun is_dnf_0 :: "pbexp \<Rightarrow> bool" where
-"is_dnf_0 (VAR p) = True"|
-"is_dnf_0 (NOT p) = True"|
-"is_dnf_0 (OR p q) = ((is_dnf_0 p) \<and> (is_dnf_0 q))"|
-"is_dnf_0 (AND p q) = ((no_or_in_and p) \<and> (no_or_in_and q))"
-
 fun is_dnf :: "pbexp \<Rightarrow> bool" where
-"is_dnf p = ((is_nnf p) \<and> (is_dnf_0 p))"
+"is_dnf (VAR p) = True"|
+"is_dnf (NOT p) = True"|
+"is_dnf (OR p q) = ((is_dnf p) \<and> (is_dnf q))"|
+"is_dnf (AND p q) = ((no_or_in_and p) \<and> (no_or_in_and q))"
 
-fun dist :: "pbexp \<Rightarrow> pbexp" where
-"dist (AND s (OR p q)) = OR (dist(AND s p)) (dist(AND s q))"|
-"dist (AND (OR p q) s) = OR (dist(AND s p)) (dist(AND s q))"|
-"dist (VAR x) = (VAR x)"|
-"dist (NOT p) = (NOT (dist p))"|
-"dist (AND p q) = (AND (dist p) (dist q))"|
-"dist (OR p q) = (OR (dist p) (dist q))"
+fun dist :: "pbexp \<Rightarrow> pbexp \<Rightarrow> pbexp" where
+"dist p (OR q r) = OR (dist p q) (dist p r)" |
+"dist (OR q r) p = OR (dist q p) (dist r p)" |
+"dist p q = AND p q"
 
-lemma pbval_dist : "pbval e s = pbval (dist e) s"
-  apply(induction e rule:dist.induct)
-  apply(auto)
+lemma pbval_dist: "pbval (dist a b) s = pbval (AND a b) s"
+  apply (induction a b rule:dist.induct)
+  apply (auto)
 done
+
+lemma is_dnf_dist: "is_dnf p \<Longrightarrow> is_dnf q \<Longrightarrow> is_dnf (dist p q)"
+  apply (induction p q rule:dist.induct)
+  apply (auto)
+done 
 
 fun dnf_of_nnf :: "pbexp \<Rightarrow> pbexp" where
 "dnf_of_nnf (VAR x) = VAR x" |
 "dnf_of_nnf (NOT p) = NOT p" |
-"dnf_of_nnf (OR p q) = dist (OR (dnf_of_nnf p) (dnf_of_nnf q))" |
-"dnf_of_nnf (AND p q) = dist (AND (dnf_of_nnf p) (dnf_of_nnf q))"
+"dnf_of_nnf (OR p q) = OR (dnf_of_nnf p) (dnf_of_nnf q)" |
+"dnf_of_nnf (AND p q) = dist (dnf_of_nnf p) (dnf_of_nnf q)"
 
+theorem "pbval (dnf_of_nnf p) s = pbval p s"
+  apply (induction p)
+  apply (auto simp add: pbval_dist)
+  done
 
+theorem "is_nnf p \<Longrightarrow> is_dnf (dnf_of_nnf p)"
+  apply (induction p rule:dnf_of_nnf.induct)
+  apply (auto simp add: is_dnf_dist)
+done
 
 text \<open> End of exercise 3.9 \<close>
 end

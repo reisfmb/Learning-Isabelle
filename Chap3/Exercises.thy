@@ -291,7 +291,7 @@ fun is_nnf :: "pbexp \<Rightarrow> bool" where
 "is_nnf (NOT (VAR x)) = True" |
 "is_nnf (NOT p) = False" |
 "is_nnf (AND p q) = (is_nnf p \<and> is_nnf q)" |
-"is_nnf (OR p q) = (is_nnf p \<or> is_nnf q)"
+"is_nnf (OR p q) = (is_nnf p \<and> is_nnf q)"
 
 fun nnf :: "pbexp \<Rightarrow> pbexp" where
 "nnf (VAR x) = (VAR x)" |
@@ -310,11 +310,6 @@ done
 lemma is_actually_a_nnf: "is_nnf (nnf b)"
   apply(induction b rule:nnf.induct)
   apply(auto)
-  done
-
-lemma neg_aux [simp] : "pbval (nnf (NOT e)) s = (\<not> (pbval (nnf e) s))"
-  apply (induction e)
-  apply auto  
   done
 
 fun no_or_in_and :: "pbexp \<Rightarrow> bool" where
