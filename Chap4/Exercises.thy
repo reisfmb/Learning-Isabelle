@@ -84,6 +84,15 @@ text \<open> End of exercise 4.3 \<close>
 
 text \<open> Exercise 4.4 \<close>
 
+inductive iter :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> nat \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" for r where
+i0:"iter r 0 x x"|
+iN:"r x y \<Longrightarrow> iter r n y z \<Longrightarrow> iter r (n+1) x z"
+
+lemma "star r x y \<Longrightarrow> \<exists>n. iter r n x y"
+  apply(induction rule: star.induct)
+  apply(auto intro: i0 iN)
+done
+
 text \<open> End of exercise 4.4 \<close>
 
 

@@ -2,6 +2,8 @@ theory Exercises
 imports Main
 begin
 
+text \<open> Exercise 4.1 \<close>
+
 datatype 'a tree = Tip | Node "'a tree" 'a "'a tree"
 
 fun set :: "'a tree \<Rightarrow> 'a set" where
@@ -30,5 +32,58 @@ done
 lemma ord_ins: "ord t \<Longrightarrow> ord (ins t n)"
   apply(induction t arbitrary:n)
   apply(auto simp add: set_ins)
+  done
+
+text \<open> End of exercise 4.1 \<close>
+
+text \<open> Exercise 4.2 \<close>
+
+inductive palindrome :: "'a list \<Rightarrow> bool" where
+"palindrome []"|
+"palindrome [a]"|
+"palindrome xs \<Longrightarrow> palindrome (a#xs@[a])"
+
+lemma "palindrome xs \<Longrightarrow> rev xs = xs"
+  apply(induction rule: palindrome.induct)
+  apply(simp_all)
 done
+
+text \<open> End of exercise 4.2 \<close>
+
+text \<open> Exercise 4.3 \<close>
+
+inductive star :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" for r where
+refl : "star r x x" |
+step : "r x y \<Longrightarrow> star r y z \<Longrightarrow> star r x z"
+
+inductive star' :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" for r where
+refl' : "star' r x x" |
+step' : "star' r x y \<Longrightarrow> r y z \<Longrightarrow> star' r x z"
+
+lemma [simp]: "star' r y z \<Longrightarrow> r x y \<Longrightarrow> star' r x z"
+  apply(induction rule: star'.induct)
+  apply(auto intro: refl' step')
+  done
+
+lemma  "star r x y \<Longrightarrow> star' r x y"
+  apply(induction rule:star.induct)
+  apply(auto intro: refl')
+done
+
+lemma [simp]: "star r x y \<Longrightarrow> r y z \<Longrightarrow> star r x z"
+  apply(induction rule: star.induct)
+  apply(auto intro: refl step)
+done
+
+lemma "star' r x y \<Longrightarrow> star r x y"
+  apply(induction rule:star'.induct)
+  apply(auto intro: refl)
+done
+
+text \<open> End of exercise 4.3 \<close>
+
+text \<open> Exercise 4.4 \<close>
+
+text \<open> End of exercise 4.4 \<close>
+
 
