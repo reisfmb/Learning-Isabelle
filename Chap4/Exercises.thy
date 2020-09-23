@@ -95,4 +95,34 @@ done
 
 text \<open> End of exercise 4.4 \<close>
 
+text \<open> Exercise 4.6 \<close>
+
+datatype aexp = N int | V string | Plus aexp aexp
+
+fun aval :: "aexp \<Rightarrow> (string \<Rightarrow> int) \<Rightarrow> int" where
+"aval (N a) s = a" |
+"aval (V x) s = s x" |
+"aval (Plus a b) s = aval a s + aval b s"
+
+inductive rel_aval :: "aexp \<Rightarrow> (string \<Rightarrow> int) \<Rightarrow> int \<Rightarrow> bool" where
+ra_N: "rel_aval (N a) s a" |
+ra_V: "rel_aval (V x) s (s x)" |
+ra_Plus: "rel_aval p s int_p \<Longrightarrow> rel_aval q s int_v \<Longrightarrow> rel_aval (Plus p q) s (int_p + int_v)" 
+
+theorem rel_aval_aval: "rel_aval a s v \<Longrightarrow> aval a s = v"
+  apply (induction rule: rel_aval.induct)
+  apply (auto)
+done
+
+theorem aval_rel_aval: "aval a s = v \<Longrightarrow> rel_aval a s v"
+  apply (induction a arbitrary: v)
+  apply (auto intro: ra_N ra_V ra_Plus)
+done
+
+theorem "rel_aval a s v \<longleftrightarrow> aval a s = v"
+  apply (auto intro: aval_rel_aval rel_aval_aval)
+done 
+
+text \<open> End of exercise 4.6 \<close>
+
 
