@@ -57,4 +57,41 @@ next
   from this have f1:"xs = ys @ zs" using tys and dzs by(metis append_eq_conv_conj)
   from this have f2:"length ys = length zs + 1" using l_xs and tys and dzs by(auto)
   then show ?thesis using f1 and f2 by(auto)
+qed
+
 text \<open> End of Exercise 5.2 \<close>
+
+text \<open> Exercise 5.3 \<close>
+
+inductive ev :: "nat \<Rightarrow> bool" where
+ev0: "ev 0" |
+evSS: "ev n \<Longrightarrow> ev(Suc(Suc n))"
+
+lemma assumes a: "ev (Suc(Suc n))" shows "ev n"
+proof -
+  show "ev n" using a
+  proof cases
+    case evSS thus "ev n"  by (simp add: ev.evSS)
+  qed
+qed
+
+text \<open> End of Exercise 5.3 \<close>
+
+text \<open> Extra \<close>
+
+lemma[simp]: "3 dvd (0::nat)" 
+  apply(auto)
+done
+
+lemma[simp]: "((n::nat) + 1)^3 + 2*(n+1) = n^3 + 3*n^2 + 3*n + 2*n + 3"
+  sledgehammer
+
+lemma "3 dvd ((n::nat)^3 + 2*n)"(is "?P n")
+proof(induction n)
+  show "?P 0" by(simp)
+next
+  fix n assume "?P n"
+  from this have "?P (n+1)" by
+
+
+text \<open> Extra \<close>

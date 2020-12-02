@@ -36,4 +36,25 @@ text \<open> End of exercise 5.1 \<close>
 
 text \<open> Exercise 5.2 \<close>
 
+lemma "(\<exists> ys zs. xs = ys @ zs \<and> length ys = length zs) 
+\<or> (\<exists> ys zs. xs = ys @ zs \<and> length ys = length zs + 1)"
+proof(cases)
+  assume "2 dvd (length xs)"
+  from this obtain k where l_xs:"length xs = 2*k" by(auto simp add: dvd_def)
+  from this obtain ys where tys:"ys = take k xs" by(auto)
+  from this obtain zs where dzs:"zs = drop k xs" by(auto)
+  from this have l1:"length ys = k" using l_xs and tys by(auto)
+  from this have f1:"xs = ys @ zs" using tys and dzs by(metis append_eq_conv_conj)
+  from this have f2:"length ys = length zs" using l_xs and l1 by(auto)
+  then show ?thesis using f1 and f2 by(auto)
+next
+  assume " \<not> 2 dvd (length xs)"
+  from this have "\<exists> k. (length xs) = 2*k + 1" by(arith)
+  from this obtain k where l_xs:"(length xs) = 2*k + 1" by(auto)
+  from this obtain ys where tys:"ys = take (Suc k) xs" by(auto)
+  from this obtain zs where dzs:"zs = drop (Suc k) xs" by(auto)
+  from this have "length ys = Suc k" using l_xs and tys by(auto) 
+  from this have f1:"xs = ys @ zs" using tys and dzs by(metis append_eq_conv_conj)
+  from this have f2:"length ys = length zs + 1" using l_xs and tys and dzs by(auto)
+  then show ?thesis using f1 and f2 by(auto)
 text \<open> End of Exercise 5.2 \<close>
