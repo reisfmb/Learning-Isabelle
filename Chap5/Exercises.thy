@@ -76,3 +76,17 @@ proof -
 qed
 
 text \<open> End of Exercise 5.3 \<close>
+
+
+
+text \<open> End of Exercise 5.4 \<close>
+
+lemma "\<not> ev (Suc (Suc (Suc 0)))" (is "\<not> ?P")
+proof
+ assume "?P"
+ from this have "ev (Suc 0)" by (cases)
+ from this show  False by (cases) 
+qed
+
+text \<open> End of Exercise 5.4 \<close>
+  
